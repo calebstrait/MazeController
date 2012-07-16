@@ -1,4 +1,4 @@
-function maze(hostname, portNumber)
+function Maze(hostname, portNumber)
     % Launch the maze program.
     % !Maze.exe
     
@@ -59,4 +59,8 @@ function get_maze_data(socket, host, port)
 
         status = pnet(socket, 'status');
     end
+end
+
+% Initialize maze settings.
+function setup_maze()
 end
