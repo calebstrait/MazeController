@@ -1,4 +1,4 @@
-function Maze(hostname, portNumber)
+function maze(hostname, portNumber)
     % Launch the maze program.
     % !Maze.exe
     

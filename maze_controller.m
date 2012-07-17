@@ -1,18 +1,18 @@
-function varargout = MazeController(varargin)
-%MAZECONTROLLER M-file for MazeController.fig
-%      MAZECONTROLLER, by itself, creates a new MAZECONTROLLER or raises the existing
+function varargout = maze_controller(varargin)
+%MAZE_CONTROLLER M-file for maze_controller.fig
+%      MAZE_CONTROLLER, by itself, creates a new MAZE_CONTROLLER or raises the existing
 %      singleton*.
 %
-%      H = MAZECONTROLLER returns the handle to a new MAZECONTROLLER or the handle to
+%      H = MAZE_CONTROLLER returns the handle to a new MAZE_CONTROLLER or the handle to
 %      the existing singleton*.
 %
-%      MAZECONTROLLER('Property','Value',...) creates a new MAZECONTROLLER using the
+%      MAZE_CONTROLLER('Property','Value',...) creates a new MAZE_CONTROLLER using the
 %      given property value pairs. Unrecognized properties are passed via
-%      varargin to MazeController_OpeningFcn.  This calling syntax produces a
+%      varargin to maze_controller_OpeningFcn.  This calling syntax produces a
 %      warning when there is an existing singleton*.
 %
-%      MAZECONTROLLER('CALLBACK') and MAZECONTROLLER('CALLBACK',hObject,...) call the
-%      local function named CALLBACK in MAZECONTROLLER.M with the given input
+%      MAZE_CONTROLLER('CALLBACK') and MAZE_CONTROLLER('CALLBACK',hObject,...) call the
+%      local function named CALLBACK in MAZE_CONTROLLER.M with the given input
 %      arguments.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
@@ -20,16 +20,16 @@ function varargout = MazeController(varargin)
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help MazeController
+% Edit the above text to modify the response to help maze_controller
 
-% Last Modified by GUIDE v2.5 16-Jul-2012 16:21:39
+% Last Modified by GUIDE v2.5 17-Jul-2012 13:43:27
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @MazeController_OpeningFcn, ...
-                   'gui_OutputFcn',  @MazeController_OutputFcn, ...
+                   'gui_OpeningFcn', @maze_controller_OpeningFcn, ...
+                   'gui_OutputFcn',  @maze_controller_OutputFcn, ...
                    'gui_LayoutFcn',  [], ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,8 +44,8 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before MazeController is made visible.
-function MazeController_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before maze_controller is made visible.
+function maze_controller_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -53,18 +53,18 @@ function MazeController_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   unrecognized PropertyName/PropertyValue pairs from the
 %            command line (see VARARGIN)
 
-% Choose default command line output for MazeController
+% Choose default command line output for maze_controller
 handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes MazeController wait for user response (see UIRESUME)
+% UIWAIT makes maze_controller wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = MazeController_OutputFcn(hObject, eventdata, handles)
+function varargout = maze_controller_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
