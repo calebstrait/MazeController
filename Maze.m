@@ -1,6 +1,6 @@
 function maze(hostname, portNumber)
     % Launch the maze program.
-    % !Maze.exe
+    !Maze.exe -serveron
     
     % Start the maze program's server.
     
