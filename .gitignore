@@ -1,3 +1,5 @@
 Image/
 Maze.exe
 maze_controller.fig
+*.asv
+*.m~
