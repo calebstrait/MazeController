@@ -221,6 +221,88 @@ classdef mazeAPI
            end
        end
        
+       % Sets the size of the maze.
+       function params_maze_size(object, numRows, numCols)
+           command = ['MazeSize', ' ', numRows, ' ', numCols];
+           
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
+           end
+       end
+       
+       % TODO: Figure out why MazeWallThick can't take two arguments.
+       % Sets the thickness of the maze walls.
+       function params_maze_wall_thickness(object, thickRatio, eyeRatio)
+           command = ['MazeWallThick', ' ', thickRatio, ' ', eyeRatio];
+           
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
+           end
+       end
+       
+       % Sets the near and far view clipping planes.
+       function params_near_far_clipping(object, near, far)
+           command = ['NearFarClip', ' ', near, ' ', far];
+           
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
+           end
+       end
+       
+       % Sets the reward object's color.
+       function params_object_color(object, RGBString)
+           command = ['ObjColor', ' ', RGBString];
+           
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
+           end
+       end
+       
+       % Sets the reward object's dimensions.
+       function params_object_dimensions(object, x, y, z)
+           command = ['ObjDim', ' ', x, ' ', y, ' ', z];
+           
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
+           end
+       end
+       
+       % Sets the object's center postion (relative to the entire maze).
+       function params_object_position(object, x, y, z)
+           command = ['ObjPos', ' ', x, ' ', y, ' ', z];
+           
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
+           end
+       end
+       
+       % Sets the reward object's rotation speed.
+       function params_object_rotation_speed(object, speed)
+           command = ['ObjRotSpeed', ' ', speed];
+           
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
+           end
+       end
+       
+       % Sets the object's rotation vector.
+       function params_object_rotation_vector(object, x, y, z)
+           command = ['ObjRotVector', ' ', x, ' ', y, ' ', z];
+           
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
+           end
+       end
+       
+       % Sets the object's shape type.
+       function params_object_shape(object, shape)
+           command = ['ObjShape', ' ', shape];
+           
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
+           end
+       end
+       
        % Sets the maze to output position data and fetches it.
        function data = param_output_data(object, onOff)
            command = ['OutputData', ' ', onOff];
@@ -234,6 +316,71 @@ classdef mazeAPI
                if length > 0
                    data = pnet(object.socket, 'read');
                end
+           end
+       end
+       
+       % Sets the screen size.
+       function params_screen_size(object, width, height)
+           command = ['ScreenSize', ' ', width, ' ', height];
+           
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
+           end
+       end
+       
+       % Sets camera position.
+       function params_set_camera(object, xPos, yPos, zPos, ...
+                                  xDir, yDir, zDir)
+           command = ['SetCamera', ' ', xPos, ' ', yPos, ' ', zPos, ' ' ...
+                      xDir, ' ', yDir, ' ', zDir];
+           
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
+           end
+       end
+       
+       % Sets stereo mode either on or off.
+       function params_stereo_enable(object, onOff)
+           command = ['StereoEnable', ' ', onOff];
+           
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
+           end
+       end
+       
+       % Sets the folder where all texture images are located.
+       function params_texture_folder(object, pathString)
+           command = ['TextureFolder', ' ', pathString];
+           
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
+           end
+       end
+       
+       % Sets the floor texture via image ID in the texture folder.
+       function params_floor_texture(object, imageID)
+           command = ['TextureIDfloor', ' ', imageID];
+           
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
+           end
+       end
+       
+       % Sets the wall texture via image ID in the texture folder.
+       function params_wall_texture(object, imageID)
+           command = ['TextureIDwall', ' ', imageID];
+           
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
+           end
+       end
+       
+       % Sets the camera view distance.
+       function params_viewing_distance(object, distance)
+           command = ['ViewDist', ' ', distance];
+           
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
            end
        end
    end

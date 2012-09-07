@@ -7,12 +7,6 @@ function maze(hostname, portNumber)
     % Set the socket
     mazeObject.socket = mazeObject.connect_to_maze;
     
-    % ------------------- TESTING ------------------- %
-    
-    
-    
-    % ----------------------------------------------- %
-    
     % TODO: Finish the setup_maze function.
     % setup_maze(mazeObject);
     
