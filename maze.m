@@ -1,6 +1,7 @@
 function maze(hostname, portNumber)
     % Instantiate a mazeAPI object.
     mazeObject = mazeAPI(hostname, portNumber);
+    mazeLayout = mazeLayout();
     
     mazeObject.open_maze_program;
     

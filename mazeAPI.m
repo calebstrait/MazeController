@@ -1,8 +1,8 @@
 classdef mazeAPI
    properties
-       hostname = '';
-       portNumber = 0;
-       socket = 0;
+       hostname
+       portNumber
+       socket
    end
    
    methods (Static)
@@ -21,6 +21,12 @@ classdef mazeAPI
    methods
        % Class constructor for mazeAPI.
        function object = mazeAPI(host, port)
+           if nargin == 0
+               host = '';
+               port = 0;
+           end
+           
+           object.socket = 0;
            object.hostname = host;
            object.portNumber = port;
        end
