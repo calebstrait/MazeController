@@ -19,20 +19,20 @@ classdef mazeLayout
     methods
         % Class constructor for mazeLayout.
         function object = mazeLayout()
-            object.mazePathEndColumn = '';
-            object.mazePathEndRow = '';
-            object.mazeColumns = '';
-            object.mazeRows = '';
-            object.mazePathStartRow = '';
-            object.mazePathStartColumn = '';
-            object.mazeTextureIDFloor = '';
-            object.mazeTextureIDWall = '';
-            object.roomEndColumn = '';
-            object.roomEndRow = '';
-            object.roomStartColumn = '';
-            object.roomStartRow = '';
-            object.roomTextureIDFloor = '';
-            object.roomTextureIDWall = '';
+            object.mazePathEndColumn = '19';
+            object.mazePathEndRow = '19';
+            object.mazeColumns = '20';
+            object.mazeRows = '20';
+            object.mazePathStartRow = '0';
+            object.mazePathStartColumn = '0';
+            object.mazeTextureIDFloor = '5';
+            object.mazeTextureIDWall = '8';
+            object.roomEndColumn = '19';
+            object.roomEndRow = '19';
+            object.roomStartColumn = '0';
+            object.roomStartRow = '0';
+            object.roomTextureIDFloor = '5';
+            object.roomTextureIDWall = '8';
         end
         
         % Property setter for mazePathEndColumn.

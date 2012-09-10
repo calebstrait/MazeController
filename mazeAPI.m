@@ -26,9 +26,9 @@ classdef mazeAPI
                port = 0;
            end
            
-           object.socket = 0;
            object.hostname = host;
            object.portNumber = port;
+           object.socket = 0;
        end
        
        % Property setter for hostname.

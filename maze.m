@@ -1,15 +1,24 @@
 function maze(hostname, portNumber)
+    % TEMPORARY VARIABLES TO SIMULATE USER INPUT %
+    
+    layoutObject = mazeLayout;
+    rewardObject = mazeReward;
+    settingsObject = mazeSettings;
+    
+    % ------------------------------------------ %
+    
     % Instantiate a mazeAPI object.
     mazeObject = mazeAPI(hostname, portNumber);
-    mazeLayout = mazeLayout();
     
     mazeObject.open_maze_program;
     
     % Set the socket
     mazeObject.socket = mazeObject.connect_to_maze;
     
-    % TODO: Finish the setup_maze function.
-    % setup_maze(mazeObject);
+    % Setup the maze.
+    generate_maze_layout(mazeObject, layoutObject);
+    generate_maze_rewards(mazeObject, rewardObject);
+    apply_maze_settings(mazeObject, settingsObject);
     
     mazeObject.disconnect_from_maze;
     
@@ -17,21 +26,14 @@ function maze(hostname, portNumber)
     % mazeObject.close_maze_program;
 end
 
-% TODO: Implement set_initial_params().
-function set_initial_params(object)
+% TODO: Implement apply_maze_settings().
+function apply_maze_settings(mazeObject, settingsObject)
 end
 
 % TODO: Implement generate_maze_layout().
-function generate_maze_layout(object)
+function generate_maze_layout(mazeObject, layoutObject)
 end
 
 % TODO: Implement generate_maze_rewards().
-function generate_maze_rewards(object)
-end
-
-% TODO: Flesh out setup_maze and finish called functions.
-function setup_maze(object)
-    generate_maze_layout(object);
-    generate_maze_rewards(object);
-    set_initial_params(object);
+function generate_maze_rewards(mazeObject, rewardObject)
 end
