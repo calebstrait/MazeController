@@ -7,11 +7,12 @@ classdef mazeReward
         positionX
         positionY
         positionZ
-        rotationSpeed
-        rotationVectorX
-        rotationVectorY
-        rotationVectorZ
+        rotVectX
+        rotVectY
+        rotVectZ
         shape
+        speed
+        typeOfReward
     end
     
     methods
@@ -24,11 +25,12 @@ classdef mazeReward
             object.positionX = '50';
             object.positionY = '50';
             object.positionZ = '250';
-            object.rotationSpeed = '4';
-            object.rotationVectorX = '0';
-            object.rotationVectorY = '1';
-            object.rotationVectorZ = '0';
+            object.speed = '4';
+            object.rotVectX = '0';
+            object.rotVectY = '1';
+            object.rotVectZ = '0';
             object.shape = '1';
+            object.typeOfReward = 'singleEndOfMaze';
         end
         
         % Property setter for color.
@@ -87,36 +89,36 @@ classdef mazeReward
             object.positionZ = positionZ;
         end
         
-        % Property setter for rotationSpeed.
-        function object = set.rotationSpeed(object, rotationSpeed)
-            % Makes sure rotationSpeed is a string before setting.
-            assert(ischar(rotationSpeed), ...
-                   'Error: rotationSpeed must be a string.');
-            object.rotationSpeed = rotationSpeed;
+        % Property setter for speed.
+        function object = set.speed(object, speed)
+            % Makes sure speed is a string before setting.
+            assert(ischar(speed), ...
+                   'Error: speed must be a string.');
+            object.speed = speed;
         end
         
-        % Property setter for rotationVectorX.
-        function object = set.rotationVectorX(object, rotationVectorX)
-            % Makes sure rotationVectorX is a string before setting.
-            assert(ischar(rotationVectorX), ...
-                   'Error: rotationVectorX must be a string.');
-            object.rotationVectorX = rotationVectorX;
+        % Property setter for rotVectX.
+        function object = set.rotVectX(object, rotVectX)
+            % Makes sure rotVectX is a string before setting.
+            assert(ischar(rotVectX), ...
+                   'Error: rotVectX must be a string.');
+            object.rotVectX = rotVectX;
         end
         
-        % Property setter for rotationVectorY.
-        function object = set.rotationVectorY(object, rotationVectorY)
-            % Makes sure rotationVectorY is a string before setting.
-            assert(ischar(rotationVectorY), ...
-                   'Error: rotationVectorY must be a string.');
-            object.rotationVectorY = rotationVectorY;
+        % Property setter for rotVectY.
+        function object = set.rotVectY(object, rotVectY)
+            % Makes sure rotVectY is a string before setting.
+            assert(ischar(rotVectY), ...
+                   'Error: rotVectY must be a string.');
+            object.rotVectY = rotVectY;
         end
         
-        % Property setter for rotationVectorZ.
-        function object = set.rotationVectorZ(object, rotationVectorZ)
-            % Makes sure rotationVectorZ is a string before setting.
-            assert(ischar(rotationVectorZ), ...
-                   'Error: rotationVectorZ must be a string.');
-            object.rotationVectorZ = rotationVectorZ;
+        % Property setter for rotVectZ.
+        function object = set.rotVectZ(object, rotVectZ)
+            % Makes sure rotVectZ is a string before setting.
+            assert(ischar(rotVectZ), ...
+                   'Error: rotVectZ must be a string.');
+            object.rotVectZ = rotVectZ;
         end
         
         % Property setter for shape.
