@@ -11,7 +11,7 @@ function maze(hostname, portNumber)
     
     mazeObject.open_maze_program;
     
-    % Set the socket
+    % Set the socket.
     mazeObject.socket = mazeObject.connect_to_maze;
     
     % Setup the maze.

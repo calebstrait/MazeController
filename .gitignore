@@ -3,3 +3,4 @@ Maze.exe
 maze_controller.fig
 *.asv
 *.m~
+*.mexw32
