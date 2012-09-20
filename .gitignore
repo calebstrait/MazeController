@@ -1,6 +1,7 @@
-Image/
-Maze.exe
-maze_controller.fig
+image/
+*.exe
+*.obj
+*.fig
 *.asv
 *.m~
 *.mexw32

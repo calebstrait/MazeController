@@ -1,6 +1,8 @@
 #include "cbw.h"
 #include "mex.h"
+#include <conio.h>
 #include <stdlib.h>
+#include <windows.h>
 
 #define BASE       2
 #define BOARDNUM   0
@@ -42,31 +44,45 @@ void prepare_event_values(int eventNum, USHORT *eventValA, USHORT *eventValB) {
 	// Convert sub binary strings to ints.
 	*eventValA = (USHORT) strtol(subBufferA, NULL, BASE);
 	*eventValB = (USHORT) strtol(subBufferB, NULL, BASE);
+	
+	printf("%s\n", buffer);
+	printf("%s\n", subBufferA);
+	printf("%s\n", subBufferB);
 }
 
-void send_event(int event) {
+void send_event(WORD event, int port) {
 	USHORT eventValA, eventValB, ULStatusC;
 	int *valAPtr = &eventValA;
 	int *valBPtr = &eventValB;
-	int ULStatusA, ULStatusB;
+	int ULStatusA = 0, ULStatusB = 0;
 	
-	if (event > 255) {
-		prepare_event_values(event, valAPtr, valBPtr);
-		
-		// Set port C to 1 or high state to indicate strobe.
-		ULStatusC = cbDOut(BOARDNUM, PORTC, STATEHIGH);
-		
-		// Send event value via FIRSTPORTA and FIRSTPORTB.
-		ULStatusA = cbDOut(BOARDNUM, PORTA, eventValA);
-		ULStatusB = cbDOut(BOARDNUM, PORTB, eventValB);
+	if (port == 0) {
+		if (event > 255) {
+			//prepare_event_values(event, valAPtr, valBPtr);
+			eventValA = (USHORT) event;
+			
+			printf("%d\n", eventValA);
+			printf("%d\n", eventValB);
+			
+			// Set port C to 1 or high state to indicate strobe.
+			ULStatusC = cbDOut(BOARDNUM, PORTC, STATEHIGH);
+			
+			// Send event value via FIRSTPORTA and FIRSTPORTB.
+			ULStatusA = cbDOut(BOARDNUM, PORTA, eventValA);
+		} else {
+			eventValA = event;
+			
+			printf("%d\n", eventValA);
+			
+			// Set port C to 1 or high state to indicate strobe.
+			//ULStatusC = cbDOut(BOARDNUM, PORTC, STATEHIGH);
+			
+			// Send event value via FIRSTPORTA.
+			ULStatusA = cbDOut(BOARDNUM, PORTA, eventValA);
+		}
 	} else {
-		eventValA = event;
-		
-		// Set port C to 1 or high state to indicate strobe.
-		ULStatusC = cbDOut(BOARDNUM, PORTC, STATEHIGH);
-		
-		// Send event value via FIRSTPORTA.
-		ULStatusA = cbDOut(BOARDNUM, PORTA, eventValA);
+		eventValB = event;
+		ULStatusB = cbDOut(BOARDNUM, PORTB, eventValB);
 	}
 	
 	// Set all ports to 0 or low state.
@@ -77,12 +93,15 @@ void send_event(int event) {
 
 void mexFunction(int nlhs, mxArray *plhs[],
 				 int nrhs, const mxArray *prhs[]) {
-	int eventNum = *mxGetPr(prhs[0]);
+	WORD eventNum = *mxGetPr(prhs[0]);
+	int port = *mxGetPr(prhs[1]);
 	
+	send_event(eventNum, port);
+	/*
 	// Arugment checking. TODO: Check to make sure value is an int.
 	if (nrhs == 1) {
 		if (eventNum >= 0 && eventNum <= 65535) {
-			send_event(eventNum);
+			send_event(eventNum, port);
 		} else {
 			mexErrMsgTxt("The value sent to Plexon must be in the "
 			             "range 0 (inclusive) to 65535 (inclusive).");
@@ -90,4 +109,5 @@ void mexFunction(int nlhs, mxArray *plhs[],
 	} else {
 		mexErrMsgTxt("There must be exactly one arguments.");
 	}
+	*/
 }
