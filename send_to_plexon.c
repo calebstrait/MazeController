@@ -2,13 +2,15 @@
 #include "mex.h"
 #include <stdlib.h>
 
-#define BASE 2
-#define BOARDNUM 0
-#define BYTE 8
-#define DIRECTION DIGITALOUT
+#define BASE       2
+#define BOARDNUM   0
+#define BYTE       8
 #define DOUBLEBYTE 16
-#define PORTA FIRSTPORTA
-#define PORTB FIRSTPORTB
+#define STATEHIGH  1
+#define STATELOW   0
+#define PORTA      FIRSTPORTA
+#define PORTB      FIRSTPORTB
+#define PORTC      FIRSTPORTC
 
 #ifndef USHORT
   typedef unsigned short USHORT;
@@ -43,7 +45,7 @@ void prepare_event_values(int eventNum, USHORT *eventValA, USHORT *eventValB) {
 }
 
 void send_event(int event) {
-	USHORT eventValA, eventValB;
+	USHORT eventValA, eventValB, ULStatusC;
 	int *valAPtr = &eventValA;
 	int *valBPtr = &eventValB;
 	int ULStatusA, ULStatusB;
@@ -51,22 +53,26 @@ void send_event(int event) {
 	if (event > 255) {
 		prepare_event_values(event, valAPtr, valBPtr);
 		
-		// Configure FIRSTPORTA and FIRSTPORTB for digital output.
-		ULStatusA = cbDConfigPort(BOARDNUM, PORTA, DIRECTION);
-		ULStatusB = cbDConfigPort(BOARDNUM, PORTB, DIRECTION);
+		// Set port C to 1 or high state to indicate strobe.
+		ULStatusC = cbDOut(BOARDNUM, PORTC, STATEHIGH);
 		
 		// Send event value via FIRSTPORTA and FIRSTPORTB.
-		ULStatusA = cbDout(BOARDNUM, PORTA, eventValA);
-		ULStatusB = cbDout(BOARDNUM, PORTB, eventValB);
+		ULStatusA = cbDOut(BOARDNUM, PORTA, eventValA);
+		ULStatusB = cbDOut(BOARDNUM, PORTB, eventValB);
 	} else {
 		eventValA = event;
 		
-		// Configure FIRSTPORTA for digital output.
-		ULStatusA = cbDConfigPort(BOARDNUM, PORTA, DIRECTION);
+		// Set port C to 1 or high state to indicate strobe.
+		ULStatusC = cbDOut(BOARDNUM, PORTC, STATEHIGH);
 		
 		// Send event value via FIRSTPORTA.
-		ULStatusA = cbDout(BOARDNUM, PORTA, eventValA);
+		ULStatusA = cbDOut(BOARDNUM, PORTA, eventValA);
 	}
+	
+	// Set all ports to 0 or low state.
+	ULStatusA = cbDOut(BOARDNUM, PORTA, STATELOW);
+	ULStatusB = cbDOut(BOARDNUM, PORTB, STATELOW);
+	ULStatusC = cbDOut(BOARDNUM, PORTC, STATELOW);
 }
 
 void mexFunction(int nlhs, mxArray *plhs[],
