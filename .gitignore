@@ -1,7 +1,6 @@
 image/
 *.exe
 *.obj
-*.fig
 *.asv
 *.m~
 *.mexw32
