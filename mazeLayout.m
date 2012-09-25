@@ -275,10 +275,5 @@ classdef mazeLayout
                    'Error: mazeSizeRows must be a string.');
             object.mazeSizeRows = mazeSizeRows;
         end
-        
-        
-        
-        
-        
     end
 end
