@@ -1,132 +1,132 @@
 classdef mazeReward
     properties
-        color
-        dimensionX
-        dimensionY
-        dimensionZ
-        positionX
-        positionY
-        positionZ
-        rotVectX
-        rotVectY
-        rotVectZ
-        shape
-        speed
+        objectColor
+        objectDimensionX
+        objectDimensionY
+        objectDimensionZ
+        objectPositionX
+        objectPositionY
+        objectPositionZ
+        objectRotVectX
+        objectRotVectY
+        objectRotVectZ
+        objectShape
+        objectSpeed
         typeOfReward
     end
     
     methods
         % Class constructor for mazeReward.
         function object = mazeReward()
-            object.color = '255 0 0';
-            object.dimensionX = '10';
-            object.dimensionY = '10';
-            object.dimensionZ = '10';
-            object.positionX = '50';
-            object.positionY = '50';
-            object.positionZ = '250';
-            object.speed = '4';
-            object.rotVectX = '0';
-            object.rotVectY = '1';
-            object.rotVectZ = '0';
-            object.shape = '1';
+            object.objectColor = '255 0 0';
+            object.objectDimensionX = '20';
+            object.objectDimensionY = '20';
+            object.objectDimensionZ = '20';
+            object.objectPositionX = '50';
+            object.objectPositionY = '50';
+            object.objectPositionZ = '250';
+            object.objectRotVectX = '0';
+            object.objectRotVectY = '1';
+            object.objectRotVectZ = '0';
+            object.objectShape = '1';
+            object.objectSpeed = '4';
             object.typeOfReward = 'singleEndOfMaze';
         end
         
-        % Property setter for color.
-        function object = set.color(object, color)
-            % Makes sure color is a string before setting.
-            assert(ischar(color), ...
-                   'Error: color must be a string.');
-            object.color = color;
+        % Property setter for objectColor.
+        function object = set.objectColor(object, objectColor)
+            % Makes sure objectColor is a string before setting.
+            assert(ischar(objectColor), ...
+                   'Error: objectColor must be a string.');
+            object.objectColor = objectColor;
         end
         
-        % Property setter for dimensionX.
-        function object = set.dimensionX(object, dimensionX)
-            % Makes sure dimensionX is a string before setting.
-            assert(ischar(dimensionX), ...
-                   'Error: dimensionX must be a string.');
-            object.dimensionX = dimensionX;
+        % Property setter for objectDimensionX.
+        function object = set.objectDimensionX(object, objectDimensionX)
+            % Makes sure objectDimensionX is a string before setting.
+            assert(ischar(objectDimensionX), ...
+                   'Error: objectDimensionX must be a string.');
+            object.objectDimensionX = objectDimensionX;
         end
         
-        % Property setter for dimensionY.
-        function object = set.dimensionY(object, dimensionY)
-            % Makes sure dimensionY is a string before setting.
-            assert(ischar(dimensionY), ...
-                   'Error: dimensionY must be a string.');
-            object.dimensionY = dimensionY;
+        % Property setter for objectDimensionY.
+        function object = set.objectDimensionY(object, objectDimensionY)
+            % Makes sure objectDimensionY is a string before setting.
+            assert(ischar(objectDimensionY), ...
+                   'Error: objectDimensionY must be a string.');
+            object.objectDimensionY = objectDimensionY;
         end
         
-        % Property setter for dimensionZ.
-        function object = set.dimensionZ(object, dimensionZ)
-            % Makes sure dimensionZ is a string before setting.
-            assert(ischar(dimensionZ), ...
-                   'Error: dimensionZ must be a string.');
-            object.dimensionZ = dimensionZ;
+        % Property setter for objectDimensionZ.
+        function object = set.objectDimensionZ(object, objectDimensionZ)
+            % Makes sure objectDimensionZ is a string before setting.
+            assert(ischar(objectDimensionZ), ...
+                   'Error: objectDimensionZ must be a string.');
+            object.objectDimensionZ = objectDimensionZ;
         end
         
-        % Property setter for positionX.
-        function object = set.positionX(object, positionX)
-            % Makes sure positionX is a string before setting.
-            assert(ischar(positionX), ...
-                   'Error: positionX must be a string.');
-            object.positionX = positionX;
+        % Property setter for objectPositionX.
+        function object = set.objectPositionX(object, objectPositionX)
+            % Makes sure objectPositionX is a string before setting.
+            assert(ischar(objectPositionX), ...
+                   'Error: objectPositionX must be a string.');
+            object.objectPositionX = objectPositionX;
         end
         
-        % Property setter for positionY.
-        function object = set.positionY(object, positionY)
-            % Makes sure positionY is a string before setting.
-            assert(ischar(positionY), ...
-                   'Error: positionY must be a string.');
-            object.positionY = positionY;
+        % Property setter for objectPositionY.
+        function object = set.objectPositionY(object, objectPositionY)
+            % Makes sure objectPositionY is a string before setting.
+            assert(ischar(objectPositionY), ...
+                   'Error: objectPositionY must be a string.');
+            object.objectPositionY = objectPositionY;
         end
         
-        % Property setter for positionZ.
-        function object = set.positionZ(object, positionZ)
-            % Makes sure positionZ is a string before setting.
-            assert(ischar(positionZ), ...
-                   'Error: positionZ must be a string.');
-            object.positionZ = positionZ;
+        % Property setter for objectPositionZ.
+        function object = set.objectPositionZ(object, objectPositionZ)
+            % Makes sure objectPositionZ is a string before setting.
+            assert(ischar(objectPositionZ), ...
+                   'Error: objectPositionZ must be a string.');
+            object.objectPositionZ = objectPositionZ;
         end
         
-        % Property setter for speed.
-        function object = set.speed(object, speed)
-            % Makes sure speed is a string before setting.
-            assert(ischar(speed), ...
-                   'Error: speed must be a string.');
-            object.speed = speed;
+        % Property setter for objectRotVectX.
+        function object = set.objectRotVectX(object, objectRotVectX)
+            % Makes sure objectRotVectX is a string before setting.
+            assert(ischar(objectRotVectX), ...
+                   'Error: objectRotVectX must be a string.');
+            object.objectRotVectX = objectRotVectX;
         end
         
-        % Property setter for rotVectX.
-        function object = set.rotVectX(object, rotVectX)
-            % Makes sure rotVectX is a string before setting.
-            assert(ischar(rotVectX), ...
-                   'Error: rotVectX must be a string.');
-            object.rotVectX = rotVectX;
+        % Property setter for objectRotVectY.
+        function object = set.objectRotVectY(object, objectRotVectY)
+            % Makes sure objectRotVectY is a string before setting.
+            assert(ischar(objectRotVectY), ...
+                   'Error: objectRotVectY must be a string.');
+            object.objectRotVectY = objectRotVectY;
         end
         
-        % Property setter for rotVectY.
-        function object = set.rotVectY(object, rotVectY)
-            % Makes sure rotVectY is a string before setting.
-            assert(ischar(rotVectY), ...
-                   'Error: rotVectY must be a string.');
-            object.rotVectY = rotVectY;
+        % Property setter for objectRotVectZ.
+        function object = set.objectRotVectZ(object, objectRotVectZ)
+            % Makes sure objectRotVectZ is a string before setting.
+            assert(ischar(objectRotVectZ), ...
+                   'Error: objectRotVectZ must be a string.');
+            object.objectRotVectZ = objectRotVectZ;
         end
         
-        % Property setter for rotVectZ.
-        function object = set.rotVectZ(object, rotVectZ)
-            % Makes sure rotVectZ is a string before setting.
-            assert(ischar(rotVectZ), ...
-                   'Error: rotVectZ must be a string.');
-            object.rotVectZ = rotVectZ;
+        % Property setter for objectShape.
+        function object = set.objectShape(object, objectShape)
+            % Makes sure objectShape is a string before setting.
+            assert(ischar(objectShape), ...
+                   'Error: objectShape must be a string.');
+            object.objectShape = objectShape;
         end
         
-        % Property setter for shape.
-        function object = set.shape(object, shape)
-            % Makes sure shape is a string before setting.
-            assert(ischar(shape), ...
-                   'Error: shape must be a string.');
-            object.shape = shape;
+        % Property setter for objectSpeed.
+        function object = set.objectSpeed(object, objectSpeed)
+            % Makes sure objectSpeed is a string before setting.
+            assert(ischar(objectSpeed), ...
+                   'Error: objectSpeed must be a string.');
+            object.objectSpeed = objectSpeed;
         end
     end
 end

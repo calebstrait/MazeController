@@ -6,15 +6,9 @@ classdef mazeAPI
    end
    
    methods (Static)
-       % Launches maze program, starts maze server, and returns control to MATLAB.
+       % Launches maze program, starts maze server, and returns control.
        function open_maze_program()
            system('Maze.exe -serveron &');
-       end
-       
-       % TODO: Figure out why this is not working when MATLAB window loses focus.
-       % Closes the maze program.
-       function close_maze_program()
-           [~, ~] = system('taskkill /IM Maze.exe');
        end
    end
    
@@ -40,7 +34,7 @@ classdef mazeAPI
        
        % Property setter for portNumber.
        function object = set.portNumber(object, port)
-           % Makes sure portNumber is a number (type numeric) before setting.
+           % Makes sure portNumber is a number before setting.
            assert(isnumeric(port), 'Error: portNumber must be a number.');
            object.portNumber = port;
        end
@@ -72,6 +66,17 @@ classdef mazeAPI
        % Disconnects from the maze by closing the UDP connection.
        function disconnect_from_maze(object)
            pnet(object.socket, 'close');
+       end
+       
+       % TODO: Figure out why this doesn't work.
+       % Reads data from the socket.
+       function data = fetch_data(object)
+           length = pnet(object.socket, 'readpacket');
+           waitfor(length);
+           
+           if length > 0
+               data = pnet(object.socket, 'read');
+           end
        end
        
        % Sends a command string to the maze.
@@ -206,8 +211,8 @@ classdef mazeAPI
        end
        
        % Sets door either on or off at a given cell and direction.
-       function param_maze_set_door(object, row, column, onOff)
-           command = ['MazeSetDoor', ' ', row, ' ', column, ' ', onOff];
+       function param_maze_set_door(object, row, column, direct)
+           command = ['MazeSetDoor', ' ', row, ' ', column, ' ', direct];
            
            if pnet(object.socket, 'status')
                object.util_send_command(command);
@@ -309,19 +314,14 @@ classdef mazeAPI
            end
        end
        
+       % TODO: Figure out why this doesn't work.
        % Sets the maze to output position data and fetches it.
-       function data = param_output_data(object, onOff)
+       function param_output_data(object, onOff)
            command = ['OutputData', ' ', onOff];
            
            % Fetch data from maze server.
            if pnet(object.socket, 'status')
                object.util_send_command(command);
-               length = pnet(object.socket, 'readpacket');
-               waitfor(length);
-               
-               if length > 0
-                   data = pnet(object.socket, 'read');
-               end
            end
        end
        
@@ -336,7 +336,7 @@ classdef mazeAPI
        
        % Sets camera position.
        function param_set_camera(object, xPos, yPos, zPos, ...
-                                  xDir, yDir, zDir)
+                                 xDir, yDir, zDir)
            command = ['SetCamera', ' ', xPos, ' ', yPos, ' ', zPos, ' ' ...
                       xDir, ' ', yDir, ' ', zDir];
            
@@ -364,7 +364,7 @@ classdef mazeAPI
        end
        
        % Sets the floor texture via image ID in the texture folder.
-       function param_floor_texture(object, imageID)
+       function param_texture_ID_floor(object, imageID)
            command = ['TextureIDfloor', ' ', imageID];
            
            if pnet(object.socket, 'status')
@@ -373,7 +373,7 @@ classdef mazeAPI
        end
        
        % Sets the wall texture via image ID in the texture folder.
-       function param_wall_texture(object, imageID)
+       function param_texture_ID_wall(object, imageID)
            command = ['TextureIDwall', ' ', imageID];
            
            if pnet(object.socket, 'status')
