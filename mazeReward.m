@@ -13,6 +13,7 @@ classdef mazeReward
         objectShape
         objectSpeed
         typeOfReward
+        viewingObject
     end
     
     methods
@@ -31,6 +32,7 @@ classdef mazeReward
             object.objectShape = '1';
             object.objectSpeed = '4';
             object.typeOfReward = 'endOfMaze';
+            object.viewingObject = '0';
         end
         
         % Property setter for objectColor.
@@ -127,6 +129,14 @@ classdef mazeReward
             assert(ischar(objectSpeed), ...
                    'Error: objectSpeed must be a string.');
             object.objectSpeed = objectSpeed;
+        end
+        
+        % Property setter for viewingObject.
+        function object = set.viewingObject(object, viewingObject)
+            % Makes sure viewingObject is a string before setting.
+            assert(ischar(viewingObject), ...
+                   'Error: viewingObject must be a string.');
+            object.viewingObject = viewingObject;
         end
     end
 end

@@ -1,9 +1,34 @@
 function maze(hostname, portNumber)
+    % ----------------------------------------- %
+    % ---------------- GLOBALS ---------------- %
+    % ----------------------------------------- %
+    
+    camDirX = '';
+    camDirY = '';
+    camDirZ = '';
+    camPosX = '';
+    camPosY = '';
+    camPosZ = '';
+    viewObj = '';
+    
+    % ----------------------------------------- %
+    % ----------------------------------------- %
+    % ----------------------------------------- %
+    
     % Instantiate maze objects.
     layoutObject = mazeLayout;
     rewardObject = mazeReward;
     settingsObject = mazeSettings;
     mazeObject = mazeAPI(hostname, portNumber);
+    
+    % Initialize camera position variables.
+    camDirX = settingsObject.setCameraDirX;
+    camDirY = settingsObject.setCameraDirY;
+    camDirZ = settingsObject.setCameraDirZ;
+    camPosX = settingsObject.setCameraPosX;
+    camPosY = settingsObject.setCameraPosY;
+    camPosZ = settingsObject.setCameraPosZ;
+    viewObj = rewardObject.viewingObject;
     
     % Open maze and connect to it.
     mazeObject.open_maze_program;
@@ -17,9 +42,21 @@ function maze(hostname, portNumber)
     collectTime = 5;
     tic;
     while toc < collectTime
+        % Get maze data from server.
         data = mazeObject.fetch_data('1');
+        
+        % Parse and store maze data.
+        dataCellArray  = textscan(data, '%s');
+        dataArray = dataCellArray{1};
+        camDirX = str2double(dataArray(1));
+        camDirY = str2double(dataArray(2));
+        camDirZ = str2double(dataArray(3));
+        camPosX = str2double(dataArray(4));
+        camPosY = str2double(dataArray(5));
+        camPosZ = str2double(dataArray(6));
+        viewObj = str2double(dataArray(7));
     end
-    data = mazeObject.fetch_data('0');
+    mazeObject.fetch_data('0');
     
     % Close connection with maze.
     mazeObject.disconnect_from_maze;
