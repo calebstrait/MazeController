@@ -11,15 +11,69 @@ function maze(hostname, portNumber)
     
     % Setup the maze.
     set_maze_layout(mazeObject, layoutObject);
-    set_maze_rewards(mazeObject, rewardObject, layoutObject);
+    set_maze_rewards(mazeObject, rewardObject);
     set_maze_settings(mazeObject, settingsObject);
     
     % Close connection with maze.
     mazeObject.disconnect_from_maze;
 end
 
+% Tunes settings to make a single big room out of the maze.
+function layoutObject = layout_big_room(layObj, rows, columns)
+    layObj.mazeSetRoomRowEnd = num2str(str2double(rows) - 1);
+    layObj.mazeSetRoomColumnEnd = num2str(str2double(columns) - 1);
+    layObj.mazeSetRoomColumnStart = '0';
+    layObj.mazeSetRoomRowStart = '0';
+    layObj.mazeSizeColumns = columns;
+    layObj.mazeSizeRows = rows;
+    layObj.mazePathColumnEnd = layObj.mazeSetRoomRowEnd;
+    layObj.mazePathColumnStart = layObj.mazeSetRoomColumnStart;
+    layObj.mazePathRowEnd = layObj.mazeSetRoomRowEnd;
+    layObj.mazePathRowStart = layObj.mazeSetRoomRowStart;
+    layObj.typeOfLayout = 'bigRoom';
+    
+    layoutObject = layObj;
+end
+
+% Tunes settings to make a regular maze.
+function layoutObject = layout_regular(layObj, rows, columns)
+    pathRowEnd = num2str(str2double(rows) - 1);
+    pathColumnEnd = num2str(str2double(columns) - 1);
+    layObj.mazeSizeColumns = columns;
+    layObj.mazeSizeRows = rows;
+    layObj.mazePathColumnEnd = pathColumnEnd;
+    layObj.mazePathRowEnd = pathRowEnd;
+    layObj.typeOfLayout = 'regular';
+    
+    layoutObject = layObj;
+end
+
 % TODO: Implement this function.
 function give_reward(rewardDuration)
+end
+
+% Tunes settings to place a single reward at the end of the maze path.
+function rewardObject = reward_at_end(layObj, rewardObj, setObj)
+    sizeX = str2double(layObj.mazeSizeColumns);
+    sizeZ = str2double(layObj.mazeSizeRows);
+    scale = str2double(setObj.mazeScale);
+    rewardObj.objectPositionX = num2str(sizeX * scale - scale / 2);
+    rewardObj.objectPositionZ = num2str(sizeZ * scale - scale / 2);
+    rewardObj.typeOfReward = 'endOfMaze';
+    
+    rewardObject = rewardObj;
+end
+
+% Tunes settings to place a single, specified reward.
+function rewardObject = reward_single(rewardObj, setObj, row, column)
+    row = str2double(row);
+    column = str2double(column);
+    scale = str2double(setObj.mazeScale);
+    rewardObj.objectPositionX = num2str(column * scale - scale / 2);
+    rewardObj.objectPositionZ = num2str(row * scale - scale / 2);
+    rewardObj.typeOfReward = 'singleSpecified';
+    
+    rewardObject = rewardObj;
 end
 
 % TODO: Implement this function.
@@ -28,13 +82,7 @@ end
 
 % TODO: Use layoutType to set specific layout features.
 function set_maze_layout(mazeObject, layoutObject)
-    % layoutType = layoutObject.typeOfLayout;
-    
-    % Set maze path starting and ending rows and columns.
-    mazeObject.param_maze_path(layoutObject.mazePathRowStart, ...
-                               layoutObject.mazePathColumnStart, ...
-                               layoutObject.mazePathRowEnd, ...
-                               layoutObject.mazePathColumnEnd);
+    layoutType = layoutObject.typeOfLayout;
     
     % Set maze seed.
     mazeObject.param_maze_seed(layoutObject.mazeSeed);
@@ -42,11 +90,36 @@ function set_maze_layout(mazeObject, layoutObject)
     % Set maze dimensions.
     mazeObject.param_maze_size(layoutObject.mazeSizeRows, ...
                                layoutObject.mazeSizeColumns);
+    
+    % If called for, make entire maze a big room.
+    if strcmp(layoutType, 'bigRoom')
+        mazeObject.param_maze_set_room(layoutObject.mazeSetRoomRowStart, ...
+                                       layoutObject.mazeSetRoomColumnStart, ...
+                                       layoutObject.mazeSetRoomRowEnd, ...
+                                       layoutObject.mazeSetRoomColumnEnd, ...
+                                       layoutObject.mazeSetRoomTextureIDWall, ...
+                                       layoutObject.mazeSetRoomTextureIDFloor);
+        
+        % Set maze path starting and ending rows and columns.
+        mazeObject.param_maze_path(layoutObject.mazePathRowStart, ...
+                                   layoutObject.mazePathColumnStart, ...
+                                   layoutObject.mazePathRowEnd, ...
+                                   layoutObject.mazePathColumnEnd);  
+    end
+        
+    % If called for, make a regular room.
+    if strcmp(layoutType, 'regular')
+        % Set maze path starting and ending rows and columns.
+        mazeObject.param_maze_path(layoutObject.mazePathRowStart, ...
+                                   layoutObject.mazePathColumnStart, ...
+                                   layoutObject.mazePathRowEnd, ...
+                                   layoutObject.mazePathColumnEnd);
+    end
 end
 
 % TODO: Use rewardType to set specific reward features..
-function set_maze_rewards(mazeObject, rewardObject, layoutObject)
-    % rewardType = rewardObject.typeOfReward;
+function set_maze_rewards(mazeObject, rewardObject)
+    rewardType = rewardObject.typeOfReward;
     
     % Set reward object color.
     mazeObject.param_object_color(rewardObject.objectColor);
@@ -55,11 +128,6 @@ function set_maze_rewards(mazeObject, rewardObject, layoutObject)
     mazeObject.param_object_dimensions(rewardObject.objectDimensionX, ...
                                        rewardObject.objectDimensionY, ...
                                        rewardObject.objectDimensionZ);
-    
-    % Set reward object position.
-    mazeObject.param_object_position(rewardObject.objectPositionX, ...
-                                     rewardObject.objectPositionY, ...
-                                     rewardObject.objectPositionZ);
     
     % Set reward object rotation vector.
     mazeObject.param_object_rotation_vector(rewardObject.objectRotVectX, ...
@@ -71,6 +139,14 @@ function set_maze_rewards(mazeObject, rewardObject, layoutObject)
     
     % Set reward object rotation speed.
     mazeObject.param_object_rotation_speed(rewardObject.objectSpeed);
+    
+    % If called for, place a single reward where specified.
+    if strcmp(rewardType, 'singleSpecified') || ...
+       strcmp(rewardType, 'endOfMaze')
+        mazeObject.param_object_position(rewardObject.objectPositionX, ...
+                                         rewardObject.objectPositionY, ...
+                                         rewardObject.objectPositionZ);
+    end
 end
 
 function set_maze_settings(mazeObject, settingsObject)

@@ -30,7 +30,7 @@ classdef mazeReward
             object.objectRotVectZ = '0';
             object.objectShape = '1';
             object.objectSpeed = '4';
-            object.typeOfReward = 'singleEndOfMaze';
+            object.typeOfReward = 'endOfMaze';
         end
         
         % Property setter for objectColor.

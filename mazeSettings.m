@@ -41,7 +41,7 @@ classdef mazeSettings
             object.calibRectHeight = '10';
             object.calibRectWidth = '10';
             object.clipPlaneNear = '1';
-            object.clipPlaneFar = '1000';
+            object.clipPlaneFar = '1000000';
             object.commandTime = '3';
             object.ctrlKeyboard = '1';
             object.ctrlMouse = '1';

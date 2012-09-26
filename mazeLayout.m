@@ -49,8 +49,8 @@ classdef mazeLayout
             object.mazeSetDoorDirection = '0';
             object.mazeSetDoorRow = '0';
             object.mazeSetRoomColumnEnd = '4';
-            object.mazeSetRoomRowEnd = '4';
             object.mazeSetRoomColumnStart = '0';
+            object.mazeSetRoomRowEnd = '4';
             object.mazeSetRoomRowStart = '0';
             object.mazeSetRoomTextureIDFloor = '5';
             object.mazeSetRoomTextureIDWall = '8';
