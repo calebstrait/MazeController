@@ -14,9 +14,18 @@ function maze(hostname, portNumber)
     set_maze_rewards(mazeObject, rewardObject);
     set_maze_settings(mazeObject, settingsObject);
     
+    collectTime = 5;
+    tic;
+    while toc < collectTime
+        data = mazeObject.fetch_data('1');
+    end
+    data = mazeObject.fetch_data('0');
+    
     % Close connection with maze.
     mazeObject.disconnect_from_maze;
 end
+
+% Returns the 
 
 % Tunes settings to make a single big room out of the maze.
 function layoutObject = layout_big_room(layObj, rows, columns)
@@ -48,8 +57,23 @@ function layoutObject = layout_regular(layObj, rows, columns)
     layoutObject = layObj;
 end
 
-% TODO: Implement this function.
+% Opens the juice line for the passed duration in seconds.
 function give_reward(rewardDuration)
+    % Set up the channel that controls the juicer.
+    juiceLine = 23;
+    juiceDIO = digitalio('mcc', 0);
+    addline(juiceDIO, juiceLine, 'out');
+    
+    % Open juicer.
+    putvalue(juiceDIO, 1);
+    
+    % Wait (stay here in code) until rewardDuration has elapsed.
+    tic;
+    while toc < rewardDuration
+    end
+    
+    % Close juicer.
+    putvalue(juiceDIO, 0);
 end
 
 % Tunes settings to place a single reward at the end of the maze path.
@@ -185,9 +209,6 @@ function set_maze_settings(mazeObject, settingsObject)
     % Set the maze clipping planes.
     mazeObject.param_near_far_clipping(settingsObject.clipPlaneNear, ...
                                        settingsObject.clipPlaneFar);
-    
-    % Turn on the data output feature.
-    mazeObject.param_output_data(settingsObject.outputData);
     
     % Set screen size.
     mazeObject.param_screen_size(settingsObject.screenSizeWidth, ...

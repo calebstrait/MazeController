@@ -68,14 +68,26 @@ classdef mazeAPI
            pnet(object.socket, 'close');
        end
        
-       % TODO: Figure out why this doesn't work.
-       % Reads data from the socket.
-       function data = fetch_data(object)
-           length = pnet(object.socket, 'readpacket');
-           waitfor(length);
+       % Sets the maze to output position data and fetches it.
+       function data = fetch_data(object, onOff)
+           command = ['OutputData', ' ', onOff];
            
-           if length > 0
-               data = pnet(object.socket, 'read');
+           % Tell server to start sending maze data.
+           if pnet(object.socket, 'status')
+               object.util_send_command(command);
+           end
+           
+           % Fetch the data if output status is on.
+           onOff = str2double(onOff);
+           if onOff == 1
+               length = pnet(object.socket, 'readpacket');
+               waitfor(length);
+               
+               if length > 0
+                   data = pnet(object.socket, 'read');
+               end
+           else
+               data = 'dataStreamOff';
            end
        end
        
@@ -309,17 +321,6 @@ classdef mazeAPI
        function param_object_shape(object, shape)
            command = ['ObjShape', ' ', shape];
            
-           if pnet(object.socket, 'status')
-               object.util_send_command(command);
-           end
-       end
-       
-       % TODO: Figure out why this doesn't work.
-       % Sets the maze to output position data and fetches it.
-       function param_output_data(object, onOff)
-           command = ['OutputData', ' ', onOff];
-           
-           % Fetch data from maze server.
            if pnet(object.socket, 'status')
                object.util_send_command(command);
            end
