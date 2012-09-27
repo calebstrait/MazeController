@@ -59,7 +59,7 @@ classdef mazeSettings
             object.setCameraDirY = '0';
             object.setCameraDirZ = '1';
             object.setCameraPosX = '50';
-            object.setCameraPosY = '100';
+            object.setCameraPosY = '50';
             object.setCameraPosZ = '50';
             object.textureFolder = 'C:\Users\bhayden\Documents\AaronCode\AaronMATLAB\MazeController\image';
             object.textureIDFloor = '3';

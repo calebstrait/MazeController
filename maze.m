@@ -1,19 +1,9 @@
 function maze(hostname, portNumber)
-    % ----------------------------------------- %
-    % ---------------- GLOBALS ---------------- %
-    % ----------------------------------------- %
+    % --------------- GLOBALS -------------- %
     
-    camDirX = '';
-    camDirY = '';
-    camDirZ = '';
-    camPosX = '';
-    camPosY = '';
-    camPosZ = '';
-    viewObj = '';
-    
-    % ----------------------------------------- %
-    % ----------------------------------------- %
-    % ----------------------------------------- %
+    % Reward object locations and distance to reward.
+    rewardPosSeries;
+    rewardingRange = 50;
     
     % Instantiate maze objects.
     layoutObject = mazeLayout;
@@ -21,14 +11,34 @@ function maze(hostname, portNumber)
     settingsObject = mazeSettings;
     mazeObject = mazeAPI(hostname, portNumber);
     
-    % Initialize camera position variables.
-    camDirX = settingsObject.setCameraDirX;
-    camDirY = settingsObject.setCameraDirY;
-    camDirZ = settingsObject.setCameraDirZ;
-    camPosX = settingsObject.setCameraPosX;
-    camPosY = settingsObject.setCameraPosY;
-    camPosZ = settingsObject.setCameraPosZ;
-    viewObj = rewardObject.viewingObject;
+    % Object position variables.
+    objPosX;
+    objPosZ;
+    
+    % Other variables.
+    mazeScale = settingsObject.mazeScale / 2;
+    juiceDuration = 0.1;
+    
+    % --------------- SETTINGS ------------- %
+    
+    % Generate all reward object locations.
+    rewardPosSeries = [3, 3; 5, 5; 8, 8; 10, 10];
+    
+    % TODO: Make sure rewardPosSeries is not empty before continuing.
+    
+    % Fetch coordinates for the first reward object position.
+    firstPos = rewardPosSeries(1, :);
+    objPosX = firstPos(1);
+    objPosZ = firstPos(2);
+    
+    % Initialize object variables.
+    rewardObject.objectPositionX = num2str(objPosX * mazeScale);
+    rewardObject.objectPositionZ = num2str(objPosZ * mazeScale);
+    
+    % Remove first position from the object position array.
+    rewardPosSeries(1, :) = [];
+    
+    % ---------------- CONFIG -------------- %
     
     % Open maze and connect to it.
     mazeObject.open_maze_program;
@@ -39,30 +49,58 @@ function maze(hostname, portNumber)
     set_maze_rewards(mazeObject, rewardObject);
     set_maze_settings(mazeObject, settingsObject);
     
-    collectTime = 5;
-    tic;
-    while toc < collectTime
+    % ----------------- MAIN --------------- %
+    
+    running = true;
+    while running
         % Get maze data from server.
         data = mazeObject.fetch_data('1');
         
-        % Parse and store maze data.
+        % Parse and store maze data in individual variables.
         dataCellArray  = textscan(data, '%s');
         dataArray = dataCellArray{1};
-        camDirX = str2double(dataArray(1));
-        camDirY = str2double(dataArray(2));
-        camDirZ = str2double(dataArray(3));
         camPosX = str2double(dataArray(4));
-        camPosY = str2double(dataArray(5));
         camPosZ = str2double(dataArray(6));
         viewObj = str2double(dataArray(7));
+        
+        % TODO: Calculate distance to current reward.
+        distanceToReward = calcsomenumber;
+        
+        % Check if reward should be given.
+        if distanceToReward <= rewardingRange && ...
+           strcmp(viewObj, '1')
+            % Reward monkey.
+            give_reward(juiceDuration);
+            
+            % Check if there are any more reward positions
+            if isempty(rewardPosSeries)
+                running = false;
+            else
+                % Set next reward position.
+                nextPos = rewardPosSeries(1, :);
+                objPosX = num2str(nextPos(1) * mazeScale);
+                objPosZ = num2str(nextPos(2) * mazeScale);
+                
+                % Remove this position from the overall reward series.
+                rewardPosSeries(1, :) = [];
+                
+                % Move reward to the new location.
+                objHeight = rewardObject.objectPositionY;
+                mazeObject.param_object_position(objPosX, ...
+                                                 objHeight, ...
+                                                 objPosZ);
+            end
+        end
     end
+    
+    % --------------- CLEANUP -------------- %
+    
+    % Stop data ouput.
     mazeObject.fetch_data('0');
     
     % Close connection with maze.
     mazeObject.disconnect_from_maze;
 end
-
-% Returns the 
 
 % Tunes settings to make a single big room out of the maze.
 function layoutObject = layout_big_room(layObj, rows, columns)
@@ -223,9 +261,6 @@ function set_maze_settings(mazeObject, settingsObject)
     mazeObject.param_control_mode(settingsObject.ctrlKeyboard, ...
                                   settingsObject.ctrlMouse);
     
-    % Set the maze control mode.
-    mazeObject.param_draw_mode(settingsObject.drawMode);
-    
     % Set the camera ("eye") movement rates.
     mazeObject.param_eye_move_step(settingsObject.eyeStepTranslate, ...
                                    settingsObject.eyeStepRotate);
@@ -274,4 +309,7 @@ function set_maze_settings(mazeObject, settingsObject)
     % Set maze wall thickness ratios.
     mazeObject.param_maze_wall_thickness(settingsObject.wallThickRatio, ...
                                          settingsObject.wallThickEyeRatio);
+    
+    % Set the maze draw mode.
+    mazeObject.param_draw_mode(settingsObject.drawMode);
 end
