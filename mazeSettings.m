@@ -48,8 +48,8 @@ classdef mazeSettings
             object.drawMode = '1';
             object.eyeOffsetX = '0';
             object.eyeOffsetY = '0';
-            object.eyeStepRotate = '2';
-            object.eyeStepTranslate = '2';
+            object.eyeStepRotate = '5';
+            object.eyeStepTranslate = '5';
             object.IODistance = '0';
             object.mazeScale = '100';
             object.outputData = '0';

@@ -1,22 +1,18 @@
 function maze(hostname, portNumber)
     % --------------- GLOBALS -------------- %
     
-    % Reward object locations and distance to reward.
-    rewardPosSeries;
+    % Distance to reward.
     rewardingRange = 50;
     
-    % Instantiate maze objects.
+    % Instantiated maze objects.
     layoutObject = mazeLayout;
     rewardObject = mazeReward;
     settingsObject = mazeSettings;
     mazeObject = mazeAPI(hostname, portNumber);
     
-    % Object position variables.
-    objPosX;
-    objPosZ;
-    
     % Other variables.
-    mazeScale = settingsObject.mazeScale / 2;
+    mazeScale = str2double(settingsObject.mazeScale);
+    scaleSubtract = mazeScale / 2;
     juiceDuration = 0.1;
     
     % --------------- SETTINGS ------------- %
@@ -26,14 +22,16 @@ function maze(hostname, portNumber)
     
     % TODO: Make sure rewardPosSeries is not empty before continuing.
     
+    layoutObject = layout_regular(layoutObject, '10', '10');
+    
     % Fetch coordinates for the first reward object position.
     firstPos = rewardPosSeries(1, :);
-    objPosX = firstPos(1);
-    objPosZ = firstPos(2);
+    objPosX = firstPos(1) * mazeScale - scaleSubtract;
+    objPosZ = firstPos(2) * mazeScale - scaleSubtract;
     
     % Initialize object variables.
-    rewardObject.objectPositionX = num2str(objPosX * mazeScale);
-    rewardObject.objectPositionZ = num2str(objPosZ * mazeScale);
+    rewardObject.objectPositionX = num2str(objPosX);
+    rewardObject.objectPositionZ = num2str(objPosZ);
     
     % Remove first position from the object position array.
     rewardPosSeries(1, :) = [];
@@ -59,16 +57,17 @@ function maze(hostname, portNumber)
         % Parse and store maze data in individual variables.
         dataCellArray  = textscan(data, '%s');
         dataArray = dataCellArray{1};
-        camPosX = str2double(dataArray(4));
-        camPosZ = str2double(dataArray(6));
+        camPosX = str2double(dataArray(1));
+        camPosZ = str2double(dataArray(3));
         viewObj = str2double(dataArray(7));
         
-        % TODO: Calculate distance to current reward.
-        distanceToReward = calcsomenumber;
+        % Calculate Euclidean distance to current reward.
+        coordMatrix = [camPosX, camPosZ; objPosX, objPosZ];
+        distanceToReward = pdist(coordMatrix, 'euclidean');
         
-        % Check if reward should be given.
+        % Check if reward should be given (within range and can see object).
         if distanceToReward <= rewardingRange && ...
-           strcmp(viewObj, '1')
+           viewObj == 1
             % Reward monkey.
             give_reward(juiceDuration);
             
@@ -78,17 +77,17 @@ function maze(hostname, portNumber)
             else
                 % Set next reward position.
                 nextPos = rewardPosSeries(1, :);
-                objPosX = num2str(nextPos(1) * mazeScale);
-                objPosZ = num2str(nextPos(2) * mazeScale);
+                objPosX = nextPos(1) * mazeScale - scaleSubtract;
+                objPosZ = nextPos(2) * mazeScale - scaleSubtract;
                 
                 % Remove this position from the overall reward series.
                 rewardPosSeries(1, :) = [];
                 
                 % Move reward to the new location.
                 objHeight = rewardObject.objectPositionY;
-                mazeObject.param_object_position(objPosX, ...
+                mazeObject.param_object_position(num2str(objPosX), ...
                                                  objHeight, ...
-                                                 objPosZ);
+                                                 num2str(objPosZ));
             end
         end
     end
