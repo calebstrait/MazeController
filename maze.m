@@ -17,23 +17,33 @@ function maze(hostname, portNumber)
     
     % --------------- SETTINGS ------------- %
     
-    % Generate all reward object locations.
-    rewardPosSeries = [3, 3; 5, 5; 8, 8; 10, 10];
-    
-    % TODO: Make sure rewardPosSeries is not empty before continuing.
-    
+    % Generate maze layout.
     layoutObject = layout_regular(layoutObject, '10', '10');
+    
+    % Generate all reward object locations.
+    path = get_path(layoutObject);
+    rewardPosSeries = path';
     
     % Fetch coordinates for the first reward object position.
     firstPos = rewardPosSeries(1, :);
-    objPosX = firstPos(1) * mazeScale - scaleSubtract;
-    objPosZ = firstPos(2) * mazeScale - scaleSubtract;
+    
+    if firstPos(2) == 0
+        objPosX = scaleSubtract;
+    else
+        objPosX = firstPos(2) * mazeScale + scaleSubtract;
+    end
+    
+    if firstPos(1) == 0
+        objPosZ = scaleSubtract;
+    else
+        objPosZ = firstPos(1) * mazeScale + scaleSubtract;
+    end
     
     % Initialize object variables.
     rewardObject.objectPositionX = num2str(objPosX);
     rewardObject.objectPositionZ = num2str(objPosZ);
     
-    % Remove first position from the object position array.
+    % Remove first position from object position array (rewardPosSeries).
     rewardPosSeries(1, :) = [];
     
     % ---------------- CONFIG -------------- %
@@ -73,18 +83,33 @@ function maze(hostname, portNumber)
             
             % Check if there are any more reward positions
             if isempty(rewardPosSeries)
+                % Hide last reward object in the series.
+                mazeObject.param_object_shape('0');
+                
+                % Quit loop.
                 running = false;
             else
                 % Set next reward position.
                 nextPos = rewardPosSeries(1, :);
-                objPosX = nextPos(1) * mazeScale - scaleSubtract;
-                objPosZ = nextPos(2) * mazeScale - scaleSubtract;
+                
+                if nextPos(2) == 0
+                    objPosX = scaleSubtract;
+                else
+                    objPosX = nextPos(2) * mazeScale + scaleSubtract;
+                end
+
+                if nextPos(1) == 0
+                    objPosZ = scaleSubtract;
+                else
+                    objPosZ = nextPos(1) * mazeScale + scaleSubtract;
+                end
                 
                 % Remove this position from the overall reward series.
                 rewardPosSeries(1, :) = [];
                 
                 % Move reward to the new location.
                 objHeight = rewardObject.objectPositionY;
+                
                 mazeObject.param_object_position(num2str(objPosX), ...
                                                  objHeight, ...
                                                  num2str(objPosZ));
@@ -99,6 +124,20 @@ function maze(hostname, portNumber)
     
     % Close connection with maze.
     mazeObject.disconnect_from_maze;
+end
+
+% Gets the series of maze cells that make up the path to the maze end.
+% TODO: Eliminate cells that come after reaching the maze end.
+function finalPath = get_path(layoutObject)
+    columns = str2double(layoutObject.mazeSizeColumns);
+    rows = str2double(layoutObject.mazeSizeRows);
+    startColumn = str2double(layoutObject.mazeBuildStartColumn);
+    startRow = str2double(layoutObject.mazeBuildStartRow);
+    mazeSeed = str2double(layoutObject.mazeSeed);
+    
+    [~, path] = MazeBuilder(rows, columns, startRow, startColumn, mazeSeed); 
+    I = path(3, :) ~= 0;
+    finalPath = path(1:2, I);
 end
 
 % Tunes settings to make a single big room out of the maze.
@@ -178,7 +217,6 @@ end
 function send_to_plexon(eventValue)
 end
 
-% TODO: Use layoutType to set specific layout features.
 function set_maze_layout(mazeObject, layoutObject)
     layoutType = layoutObject.typeOfLayout;
     
@@ -215,7 +253,6 @@ function set_maze_layout(mazeObject, layoutObject)
     end
 end
 
-% TODO: Use rewardType to set specific reward features..
 function set_maze_rewards(mazeObject, rewardObject)
     rewardType = rewardObject.typeOfReward;
     

@@ -1,8 +1,3 @@
 image/
-*.exe
-*.obj
 *.asv
 *.m~
-*.mexw32
-*.log
-*.lib
