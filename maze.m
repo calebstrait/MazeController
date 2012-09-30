@@ -1,8 +1,9 @@
 function maze(hostname, portNumber)
     % --------------- GLOBALS -------------- %
     
+    % TODO: Place most used vars up here; make them accept ints.
     % Distance to reward.
-    rewardingRange = 50;
+    rewardingRange = 80;
     
     % Instantiated maze objects.
     layoutObject = mazeLayout;
@@ -14,37 +15,65 @@ function maze(hostname, portNumber)
     mazeScale = str2double(settingsObject.mazeScale);
     scaleSubtract = mazeScale / 2;
     juiceDuration = 0.1;
+    layoutType = 'regular';    % Values: 'regular' or 'bigRoom'.
+    rewardType = 'pathToEnd';  % Values: 'atEnd', 'single', or 'pathToEnd'.
+    % TODO: Make these setting work for rewards too.
+    dimColumn = '5';
+    dimRow = '5';
+    rewardColumn = '3';
+    rewardRow = '3';
     
     % --------------- SETTINGS ------------- %
     
     % Generate maze layout.
-    layoutObject = layout_regular(layoutObject, '10', '10');
-    
-    % Generate all reward object locations.
-    path = get_path(layoutObject);
-    rewardPosSeries = path';
-    
-    % Fetch coordinates for the first reward object position.
-    firstPos = rewardPosSeries(1, :);
-    
-    if firstPos(2) == 0
-        objPosX = scaleSubtract;
-    else
-        objPosX = firstPos(2) * mazeScale + scaleSubtract;
+    if strcmp(layoutType, 'regular')
+        layoutObject = layout_regular(layoutObject, dimRow, dimColumn);
+    elseif strcmp(layoutType, 'bigRoom')
+        layoutObject = layout_big_room(layoutObject, dimRow, dimColumn);
     end
     
-    if firstPos(1) == 0
-        objPosZ = scaleSubtract;
-    else
-        objPosZ = firstPos(1) * mazeScale + scaleSubtract;
+    % Generate maze reward.
+    if strcmp(rewardType, 'atEnd')
+        rewardObject = reward_at_end(layoutObject, ...
+                                     rewardObject, ...
+                                     settingsObject);
+        
+        objPosX = rewardObject.objectPositionX;
+        objPosZ = rewardObject.objectPositionZ;
+    elseif strcmp(rewardType, 'single')
+        rewardObject = reward_single(rewardObject, ...
+                                     settingsObject, ...
+                                     rewardRow, ...
+                                     rewardColumn);
+        
+        objPosX = rewardObject.objectPositionX;
+        objPosZ = rewardObject.objectPositionZ;
+    elseif strcmp(rewardType, 'pathToEnd')
+        % Generate all reward object locations.
+        rewardPosSeries = get_path(layoutObject);
+
+        % Fetch coordinates for the first reward object position.
+        firstPos = rewardPosSeries(1, :);
+
+        if firstPos(2) == 0
+            objPosX = scaleSubtract;
+        else
+            objPosX = firstPos(2) * mazeScale + scaleSubtract;
+        end
+
+        if firstPos(1) == 0
+            objPosZ = scaleSubtract;
+        else
+            objPosZ = firstPos(1) * mazeScale + scaleSubtract;
+        end
+
+        % Initialize object variables.
+        rewardObject.objectPositionX = num2str(objPosX);
+        rewardObject.objectPositionZ = num2str(objPosZ);
+
+        % Remove first position from object position array (rewardPosSeries).
+        rewardPosSeries(1, :) = [];
     end
-    
-    % Initialize object variables.
-    rewardObject.objectPositionX = num2str(objPosX);
-    rewardObject.objectPositionZ = num2str(objPosZ);
-    
-    % Remove first position from object position array (rewardPosSeries).
-    rewardPosSeries(1, :) = [];
     
     % ---------------- CONFIG -------------- %
     
@@ -75,44 +104,59 @@ function maze(hostname, portNumber)
         coordMatrix = [camPosX, camPosZ; objPosX, objPosZ];
         distanceToReward = pdist(coordMatrix, 'euclidean');
         
-        % Check if reward should be given (within range and can see object).
-        if distanceToReward <= rewardingRange && ...
-           viewObj == 1
-            % Reward monkey.
-            give_reward(juiceDuration);
-            
-            % Check if there are any more reward positions
-            if isempty(rewardPosSeries)
-                % Hide last reward object in the series.
-                mazeObject.param_object_shape('0');
+        % Check for a placed reward or a reward at the end.
+        if strcmp(rewardType, 'single') || ...
+           strcmp(rewardType, 'atEnd')
+           % Check if reward should be given (within range and can see object).
+            if distanceToReward <= rewardingRange && ...
+               viewObj == 1
+                % Reward monkey.
+                give_reward(juiceDuration);
                 
                 % Quit loop.
                 running = false;
-            else
-                % Set next reward position.
-                nextPos = rewardPosSeries(1, :);
-                
-                if nextPos(2) == 0
-                    objPosX = scaleSubtract;
-                else
-                    objPosX = nextPos(2) * mazeScale + scaleSubtract;
-                end
+            end
+        % Check for a reward in a path.
+        elseif strcmp(rewardType, 'pathToEnd')
+            % Check if reward should be given (within range and can see object).
+            if distanceToReward <= rewardingRange && ...
+               viewObj == 1
+                % Reward monkey.
+                give_reward(juiceDuration);
 
-                if nextPos(1) == 0
-                    objPosZ = scaleSubtract;
+                % Check if there are any more reward positions
+                if isempty(rewardPosSeries)
+                    % Hide last reward object in the series.
+                    mazeObject.param_object_shape('0');
+
+                    % Quit loop.
+                    running = false;
                 else
-                    objPosZ = nextPos(1) * mazeScale + scaleSubtract;
+                    % Set next reward position.
+                    nextPos = rewardPosSeries(1, :);
+
+                    if nextPos(2) == 0
+                        objPosX = scaleSubtract;
+                    else
+                        objPosX = nextPos(2) * mazeScale + scaleSubtract;
+                    end
+
+                    if nextPos(1) == 0
+                        objPosZ = scaleSubtract;
+                    else
+                        objPosZ = nextPos(1) * mazeScale + scaleSubtract;
+                    end
+
+                    % Remove this position from the overall reward series.
+                    rewardPosSeries(1, :) = [];
+
+                    % Move reward to the new location.
+                    objHeight = rewardObject.objectPositionY;
+
+                    mazeObject.param_object_position(num2str(objPosX), ...
+                                                     objHeight, ...
+                                                     num2str(objPosZ));
                 end
-                
-                % Remove this position from the overall reward series.
-                rewardPosSeries(1, :) = [];
-                
-                % Move reward to the new location.
-                objHeight = rewardObject.objectPositionY;
-                
-                mazeObject.param_object_position(num2str(objPosX), ...
-                                                 objHeight, ...
-                                                 num2str(objPosZ));
             end
         end
     end
@@ -135,9 +179,34 @@ function finalPath = get_path(layoutObject)
     startRow = str2double(layoutObject.mazeBuildStartRow);
     mazeSeed = str2double(layoutObject.mazeSeed);
     
+    % Find path through entire maze.
     [~, path] = MazeBuilder(rows, columns, startRow, startColumn, mazeSeed); 
     I = path(3, :) ~= 0;
-    finalPath = path(1:2, I);
+    initialPath = path(1:2, I);
+    
+    % Format path matrix; reduce the path so that it stops at the maze end.
+    transposedMatrix = initialPath';
+    matrixDim = size(transposedMatrix);
+    numCells = matrixDim(1);
+    endColumn = columns - 1;
+    endRow = rows - 1;
+    lastCell = 0;
+    index = 1;
+    
+    searching = true;
+    while searching && index ~= numCells
+        cellCoords = transposedMatrix(index, :);
+        
+        if cellCoords(1) == endRow && cellCoords(2) == endColumn
+            lastCell = index;
+            searching = false;
+        end
+        
+        index = index + 1;
+    end
+    
+    % Return the shortened maze path (ends at maze end).
+    finalPath = transposedMatrix(2:lastCell, :);
 end
 
 % Tunes settings to make a single big room out of the maze.
@@ -211,6 +280,10 @@ function rewardObject = reward_single(rewardObj, setObj, row, column)
     rewardObj.typeOfReward = 'singleSpecified';
     
     rewardObject = rewardObj;
+end
+
+% TODO: Implement this function.
+function save_trial_data()
 end
 
 % TODO: Implement this function.
