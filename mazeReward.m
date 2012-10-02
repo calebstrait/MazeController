@@ -19,7 +19,7 @@ classdef mazeReward
     methods
         % Class constructor for mazeReward.
         function object = mazeReward()
-            object.objectColor = '255 0 0';
+            object.objectColor = '223 118 0';
             object.objectDimensionX = '20';
             object.objectDimensionY = '20';
             object.objectDimensionZ = '20';
@@ -30,7 +30,7 @@ classdef mazeReward
             object.objectRotVectY = '1';
             object.objectRotVectZ = '0';
             object.objectShape = '1';
-            object.objectSpeed = '4';
+            object.objectSpeed = '1';
             object.typeOfReward = 'endOfMaze';
             object.viewingObject = '0';
         end

@@ -1,11 +1,45 @@
-function maze(hostname, portNumber)
-    % --------------- GLOBALS -------------- %
+function maze(monkeysInitial, hostname, portNumber)
+    % ---------- CHANGEABLE GLOBALS --------- %
     
-    % TODO: Place most used vars up here; make them accept ints.
-    % Distance to reward.
-    rewardingRange = 80;
+    layoutType     = 'bigRoom';    % Values: 'regular' or 'bigRoom'. Sets what
+                                   %         type of maze layout is used.
+    rewardType     = 'atEnd';     % Values: 'atEnd', 'pathToEnd', or 'single'.
+                                   %         Sets what type of maze rewarding
+                                   %         system is used.
+    buttonType     = 'speed';      % Values: 'color', 'shape', or 'speed'.
+    dimColumn      = 5;            % Value: Integers. Number of maze columns.
+    dimRow         = 5;            % Value: Integers. Number of maze rows.
+    rewardColumn   = 3;            % Value: Integers. Column where a single
+                                   %        reward is placed.
+    rewardRow      = 3;            % Value: Integers. Row where a single
+                                   %        reward is placed.
+    rewardingRange = 50;           % Value: Integers. Minimum distance to the
+                                   %        reward object at which a reward
+                                   %        will be given.
+    juiceDuration  = 0.1;          % Value: Floating point numbers. Length of
+                                   %        time that juicer will be open.
+    data           = struct([]);   % Value: Structure. Workspace variable
+                                   %        where trial data is saved.
+    saveLocation   = '\Data\Maze'; % Value: String. Path to folder where
+                                   %        trial data is saved.
+    saveCommand    = NaN;          % Value: Set by program.
+    varName        = 'data';       % Value: String. Name of the variable to
+                                   %        save trial data in the workspace.
     
-    % Instantiated maze objects.
+    % ------------ OTHER GLOBALS ------------ %
+    
+    % Saved variables.
+    camPosX = 0;
+    camPosY = 0;
+    camPosZ = 0;
+    camDirX = 0;
+    camDirY = 0;
+    camDirZ = 0;
+    viewObj = 0;
+    buttonPressed = 0;
+    currTrial = 0;
+    
+    % Instantiate maze objects.
     layoutObject = mazeLayout;
     rewardObject = mazeReward;
     settingsObject = mazeSettings;
@@ -14,14 +48,15 @@ function maze(hostname, portNumber)
     % Other variables.
     mazeScale = str2double(settingsObject.mazeScale);
     scaleSubtract = mazeScale / 2;
-    juiceDuration = 0.1;
-    layoutType = 'regular';    % Values: 'regular' or 'bigRoom'.
-    rewardType = 'pathToEnd';  % Values: 'atEnd', 'single', or 'pathToEnd'.
-    % TODO: Make these setting work for rewards too.
-    dimColumn = '5';
-    dimRow = '5';
-    rewardColumn = '3';
-    rewardRow = '3';
+    toggleColor = '0 255 0';
+    toggleShape = '2';
+    toggleSpeed = '5';
+    
+    % Conversion to strings.
+    dimColumn = num2str(dimColumn);
+    dimRow = num2str(dimRow);
+    rewardColumn = num2str(rewardColumn);
+    rewardRow = num2str(rewardRow);
     
     % --------------- SETTINGS ------------- %
     
@@ -34,20 +69,23 @@ function maze(hostname, portNumber)
     
     % Generate maze reward.
     if strcmp(rewardType, 'atEnd')
+        layoutObject.mazeSizeColumns = dimColumn;
+        layoutObject.mazeSizeRows = dimRow;
+        
         rewardObject = reward_at_end(layoutObject, ...
                                      rewardObject, ...
                                      settingsObject);
         
-        objPosX = rewardObject.objectPositionX;
-        objPosZ = rewardObject.objectPositionZ;
+        objPosX = str2double(rewardObject.objectPositionX);
+        objPosZ = str2double(rewardObject.objectPositionZ);
     elseif strcmp(rewardType, 'single')
         rewardObject = reward_single(rewardObject, ...
                                      settingsObject, ...
                                      rewardRow, ...
                                      rewardColumn);
         
-        objPosX = rewardObject.objectPositionX;
-        objPosZ = rewardObject.objectPositionZ;
+        objPosX = str2double(rewardObject.objectPositionX);
+        objPosZ = str2double(rewardObject.objectPositionZ);
     elseif strcmp(rewardType, 'pathToEnd')
         % Generate all reward object locations.
         rewardPosSeries = get_path(layoutObject);
@@ -77,6 +115,9 @@ function maze(hostname, portNumber)
     
     % ---------------- CONFIG -------------- %
     
+    % Get ready for saving trial data.
+    % saveCommand = prepare_for_saving(varName, saveLocation, monkeysInitial);
+    
     % Open maze and connect to it.
     mazeObject.open_maze_program;
     mazeObject.socket = mazeObject.connect_to_maze;
@@ -97,8 +138,28 @@ function maze(hostname, portNumber)
         dataCellArray  = textscan(data, '%s');
         dataArray = dataCellArray{1};
         camPosX = str2double(dataArray(1));
+        camPosY = str2double(dataArray(2));
         camPosZ = str2double(dataArray(3));
+        camDirX = str2double(dataArray(4));
+        camDirY = str2double(dataArray(5));
+        camDirZ = str2double(dataArray(6));
         viewObj = str2double(dataArray(7));
+        buttonPressed = str2double(dataArray(8));
+        
+        % Events triggered by joystick button press.
+        if buttonPressed == 8
+            if strcmp(buttonType, 'color')
+                mazeObject.param_object_color(toggleColor);
+            elseif strcmp(buttonType, 'shape')
+                mazeObject.param_object_shape(toggleShape);
+            elseif strcmp(buttonType, 'speed')
+                mazeObject.param_object_rotation_speed(toggleSpeed);
+            end
+        else
+            mazeObject.param_object_color(rewardObject.objectColor);
+            mazeObject.param_object_shape(rewardObject.objectShape);
+            mazeObject.param_object_rotation_speed(rewardObject.objectSpeed);
+        end
         
         % Calculate Euclidean distance to current reward.
         coordMatrix = [camPosX, camPosZ; objPosX, objPosZ];
@@ -111,7 +172,13 @@ function maze(hostname, portNumber)
             if distanceToReward <= rewardingRange && ...
                viewObj == 1
                 % Reward monkey.
-                give_reward(juiceDuration);
+                give_reward(juiceDuration, buttonPressed);
+                
+                % Save.
+                % save_trial_data;
+                
+                % Hide the reward object.
+                mazeObject.param_object_shape('0');
                 
                 % Quit loop.
                 running = false;
@@ -122,7 +189,10 @@ function maze(hostname, portNumber)
             if distanceToReward <= rewardingRange && ...
                viewObj == 1
                 % Reward monkey.
-                give_reward(juiceDuration);
+                give_reward(juiceDuration, buttonPressed);
+                
+                % Save.
+                % save_trial_data;
 
                 % Check if there are any more reward positions
                 if isempty(rewardPosSeries)
@@ -168,10 +238,26 @@ function maze(hostname, portNumber)
     
     % Close connection with maze.
     mazeObject.disconnect_from_maze;
+    
+    % Saves trial data to a .mat file.
+    function save_trial_data()
+        data(currTrial).trial = currTrial;
+        data(currTrial).camPosX = camPosX;
+        data(currTrial).camPosY = camPosY;
+        data(currTrial).camPosZ = camPosZ;
+        data(currTrial).camDirX = camDirX;
+        data(currTrial).camDirY = camDirY;
+        data(currTrial).camDirZ = camDirZ;
+        data(currTrial).viewObj = viewObj;
+        data(currTrial).buttonPressed = buttonPressed;
+        
+        eval(saveCommand);
+    end
 end
 
+% ------------------ FUNCTIONS ------------------ %
+
 % Gets the series of maze cells that make up the path to the maze end.
-% TODO: Eliminate cells that come after reaching the maze end.
 function finalPath = get_path(layoutObject)
     columns = str2double(layoutObject.mazeSizeColumns);
     rows = str2double(layoutObject.mazeSizeRows);
@@ -240,11 +326,16 @@ function layoutObject = layout_regular(layObj, rows, columns)
 end
 
 % Opens the juice line for the passed duration in seconds.
-function give_reward(rewardDuration)
+function give_reward(rewardDuration, button)
     % Set up the channel that controls the juicer.
     juiceLine = 23;
+    extra = 0.08;
     juiceDIO = digitalio('mcc', 0);
     addline(juiceDIO, juiceLine, 'out');
+    
+    if button == 8
+        rewardDuration = rewardDuration + extra;
+    end
     
     % Open juicer.
     putvalue(juiceDIO, 1);
@@ -258,13 +349,53 @@ function give_reward(rewardDuration)
     putvalue(juiceDIO, 0);
 end
 
+% Makes a folder and file where data will be saved.
+function saveCommand = prepare_for_saving(varName, saveLocation, ...
+                                          monkeysInitial)
+    cd(saveLocation);
+    
+    % Check if cell ID was passed in with monkey's initial.
+    if numel(monkeysInitial) == 1
+        initial = monkeysInitial;
+        cell = '';
+    else
+        initial = monkeysInitial(1);
+        cell = monkeysInitial(2);
+    end
+    
+    dateStr = datestr(now, 'yymmdd');
+    filename = [initial dateStr '.' cell '1.Maze.mat'];
+    folderNameDay = [initial dateStr];
+    
+    % Make and/or enter a folder where .mat files will be saved.
+    if exist(folderNameDay, 'dir') == 7
+        cd(folderNameDay);
+    else
+        mkdir(folderNameDay);
+        cd(folderNameDay);
+    end
+    
+    % Make sure the filename for the .mat file is not already used.
+    fileNum = 1;
+    while fileNum ~= 0
+        if exist(filename, 'file') == 2
+            fileNum = fileNum + 1;
+            filename = [initial dateStr '.' cell num2str(fileNum) '.Maze.mat'];
+        else
+            fileNum = 0;
+        end
+    end
+    
+    saveCommand = ['save ' filename ' ' varName];
+end
+
 % Tunes settings to place a single reward at the end of the maze path.
 function rewardObject = reward_at_end(layObj, rewardObj, setObj)
-    sizeX = str2double(layObj.mazeSizeColumns);
-    sizeZ = str2double(layObj.mazeSizeRows);
+    dimX = str2double(layObj.mazeSizeColumns);
+    dimZ = str2double(layObj.mazeSizeRows);
     scale = str2double(setObj.mazeScale);
-    rewardObj.objectPositionX = num2str(sizeX * scale - scale / 2);
-    rewardObj.objectPositionZ = num2str(sizeZ * scale - scale / 2);
+    rewardObj.objectPositionX = num2str(dimX * scale - scale / 2);
+    rewardObj.objectPositionZ = num2str(dimZ * scale - scale / 2);
     rewardObj.typeOfReward = 'endOfMaze';
     
     rewardObject = rewardObj;
@@ -272,8 +403,8 @@ end
 
 % Tunes settings to place a single, specified reward.
 function rewardObject = reward_single(rewardObj, setObj, row, column)
-    row = str2double(row);
-    column = str2double(column);
+    row = str2double(row) + 1;
+    column = str2double(column) + 1;
     scale = str2double(setObj.mazeScale);
     rewardObj.objectPositionX = num2str(column * scale - scale / 2);
     rewardObj.objectPositionZ = num2str(row * scale - scale / 2);
@@ -282,12 +413,28 @@ function rewardObject = reward_single(rewardObj, setObj, row, column)
     rewardObject = rewardObj;
 end
 
-% TODO: Implement this function.
-function save_trial_data()
-end
-
-% TODO: Implement this function.
+% Takes integer values to send to Plexon in a binary representation.
 function send_to_plexon(eventValue)
+    allOff = [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+    pinOnDuration = 0.001;
+    
+    % Convert integer eventValue to binary.
+    pinData = de2bi(eventValue, 15, 'left-msb');
+    
+    % Set up 15 pins for output.
+    plexonDIO = digitalio('mcc', 0);
+    addline(plexonDIO, 0:14, 'out');
+    
+    % Flip pins on.
+    putvalue(plexonDIO, pinData);
+    
+    % Briefly pause.
+    tic;
+    while toc < pinOnDuration
+    end
+    
+    % Flip pins off.
+    putvalue(plexonDIO, allOff);
 end
 
 function set_maze_layout(mazeObject, layoutObject)
