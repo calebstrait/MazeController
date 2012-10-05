@@ -1,4 +1,4 @@
-function maze(monkeysInitial, hostname, portNumber)
+function maze(monkeysInitial)
     % ---------- CHANGEABLE GLOBALS --------- %
     
     layoutType     = 'regular';     % Values: 'bigRoom' or 'regular'. Sets what
@@ -27,6 +27,9 @@ function maze(monkeysInitial, hostname, portNumber)
                                     %        save trial data in the workspace.
     
     % ------------ OTHER GLOBALS ------------ %
+    
+    hostname = '127.0.0.1';
+    portNumber = 80;
     
     % Saved variables.
     camPosX = 0;
@@ -243,7 +246,7 @@ function maze(monkeysInitial, hostname, portNumber)
     
     % Saves trial data to a .mat file.
     function save_trial_data()
-        data(currTrial).trial = currTrial;
+        data(currTrial).trial = currTrial; %#ok<SETNU>
         data(currTrial).camPosX = camPosX;
         data(currTrial).camPosY = camPosY;
         data(currTrial).camPosZ = camPosZ;
@@ -371,8 +374,6 @@ function saveCommand = prepare_for_saving(varName, saveLocation, ...
     % Make a folder where .mat files will be saved.
     if exist(savePath, 'dir') == 0
         mkdir(savePath);
-        disp('should have made directory');
-        disp(savePath);
     end
     
     % Make sure the filename for the .mat file is not already used.
