@@ -1,11 +1,11 @@
 # Maze API and Example Program Documentation
 
 ## Contents
-#### * [Maze API](#mazeapi)
-#### * [Example Program](#exampleprogram)
-#### * [Layout Class](#layoutclass)
-#### \* [Reward Class](#rewardclass)
-#### \* [Settings Class](#settingsclass)
+#### [Maze API](#mazeapi)
+#### [Example Program](#exampleprogram)
+#### [Layout Class](#layoutclass)
+#### [Reward Class](#rewardclass)
+#### [Settings Class](#settingsclass)
 
 ## <a name="mazeapi"></a>Maze API (mazeAPI.m)
 
